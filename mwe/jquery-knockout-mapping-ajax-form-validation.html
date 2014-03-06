@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+<body>
+
+	<script type="text/javascript" src="scripts/jquery-2.1.0.js"></script>
+	<script type="text/javascript" src="scripts/jquery.validate-1.11.1.js"></script>
+	<script type="text/javascript" src="scripts/jquery.form-3.50.0-2014.02.05.js"></script>
+	<script type="text/javascript" src="scripts/knockout-3.1.0.js"></script>
+	<script type="text/javascript" src="scripts/knockout.mapping-2.4.1.js"></script>
+
+	<form>
+		<div>
+			<label for="short">Short Text</label>
+			<input data-bind="value: input.short" id="short" name="short" maxlength="10" required />
+		</div>
+		<div>
+			<label for="short">Long Text</label>
+			<input data-bind="value: input.long" id="long" name="long" minlength="10" required />
+		<div>
+		<div>
+			<button type="submit">Submit</button>
+		</div>
+	</form>
+
+	<script>
+
+		function fakeAjax() {
+			var json = $.parseJSON('{"short": "short", "long": "looooooong"}');
+			return json;
+		};
+
+		function ViewModel(json) {
+			self = this;
+			self.input = ko.mapping.fromJS(json);
+		};
+
+		$(document).ready(function () {
+			var json = fakeAjax();
+			var viewModel = new ViewModel(json);
+			ko.applyBindings(viewModel);	
+		});
+
+		$("form").validate();
+
+		$("form").ajaxForm(function() {
+			alert("AJAX AWAY!");
+		});
+
+	</script>
+
+</body>
+</html>

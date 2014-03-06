@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+<body>
+
+	<script type="text/javascript" src="scripts/jquery-2.1.0.js"></script>
+	<script type="text/javascript" src="scripts/jquery.validate-1.11.1.js"></script>
+	<script type="text/javascript" src="scripts/knockout-3.1.0.js"></script>
+
+	<form>
+		<div>
+			<label for="short">Short Text</label>
+			<input data-bind="value: short" id="short" name="short" maxlength="10" required />
+		</div>
+		<div>
+			<label for="short">Long Text</label>
+			<input data-bind="value: long" id="long" name="long" minlength="10" required />
+		<div>
+		<div>
+			<button type="submit">Submit</button>
+		</div>
+	</form>
+
+	<script>
+
+		function ViewModel() {
+			self = this;
+			self.short = ko.observable("short");
+			self.long = ko.observable("looooooong");
+		}
+
+		ko.applyBindings(new ViewModel());
+
+		$("form").validate();
+
+	</script>
+
+</body>
+</html>
