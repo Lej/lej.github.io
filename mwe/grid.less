@@ -1,0 +1,104 @@
+@debug: true;
+@columns: 12;
+@spacing: 0.5em;
+@medium: 768px;
+@large: 992px;
+
+.border-box()
+{
+    -webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	        box-sizing: border-box;
+}
+
+.container
+{
+	width: 95%;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: @spacing;
+	padding-right: @spacing;
+
+	*
+	{
+		.border-box;
+	}
+}
+
+.row
+{
+	margin-left: -@spacing;
+	margin-right: -@spacing;
+	&:before, &:after
+	{
+		content: " ";
+		display: table;
+	}
+	&:after
+	{
+		clear: both;
+	}
+}
+
+.row when (@debug = true)
+{
+	outline: #000000 solid medium;
+}
+
+.col()
+{
+	min-height: 1px;
+	padding-left: @spacing;
+	padding-right: @spacing;
+}
+
+.col() when (@debug = true)
+{
+	outline: #aaaaaa dashed thin;
+}
+
+/* Generate common column settings */
+.gen-cols();
+/* Helpers */
+.gen-cols(@limit: @columns, @current: 1)
+{
+	@new: ~".col-small-@{current}, .col-medium-@{current}, .col-large-@{current}";
+	.gen-cols(@limit, 2, @new);
+}
+.gen-cols(@limit, @current, @prevCols) when (@current <= @limit)
+{
+	@newCols: ~".col-small-@{current}, .col-medium-@{current}, .col-large-@{current}";
+	.gen-cols(@limit, (@current + 1), ~"@{prevCols}, @{newCols}");
+}
+.gen-cols(@limit, @current, @cols) when (@current > @limit)
+{
+	@{cols} {
+		.col;
+	}
+}
+
+/* Generate column widths */
+.gen-cols-width(phone);
+@media (min-width: @medium) {
+	.gen-cols-width(medium);
+}
+@media (min-width: @large) {
+	.gen-cols-width(large);
+}
+/* Helpers */
+.width(@parts)
+{
+	@width: 100% * @parts / @columns;
+}
+.gen-cols-width(@device, @limit: @columns, @current: 1) when (@current <= @limit)
+{
+	// Code Output
+	.col-@{device}-@{current}
+	{
+		.width(@current);
+		width: @width;
+		float: left;
+	}
+	// Next Iteration
+	.gen-cols-width(@device, @limit, (@current + 1));
+}
