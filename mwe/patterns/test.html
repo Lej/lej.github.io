@@ -1,0 +1,24 @@
+<html>
+<body>
+
+	<script type="text/javascript" src="com.example.Fifo.js"></script>
+	<script type="text/javascript" src="com.example.Utils.js"></script>
+	<script type="text/javascript">
+
+		var fifo = new com.example.Fifo({
+			queue: [1, 2, 3]
+		});
+		console.log(fifo.toString());
+		console.log(fifo.dequeue());
+		console.log(fifo.toString());
+		console.log(fifo.enqueueAll([4,5,6]));
+		console.log(fifo.toString());
+
+		console.log(com.example.Utils.randomInt(1,6));
+		console.log(com.example.Utils.randomInt(1,6));
+		console.log(com.example.Utils.randomInt(1,6));
+
+	</script>
+
+</body>
+</html>
