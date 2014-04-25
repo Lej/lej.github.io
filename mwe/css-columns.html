@@ -1,0 +1,50 @@
+<html>
+<body>
+
+<style type="text/css">
+
+.red { background-color: red; }
+.blue { background-color: blue; }
+.green { background-color: green; }
+.yellow { background-color: yellow; }
+.wide { width: 100% }
+.rad {
+    margin-left: -15px;
+    margin-right: -15px;
+}
+.rad:before,
+.rad:after {
+    content: " ";
+    display: table;
+}
+.rad:after {
+    clear: both;
+}
+
+.kol {
+    width: 50%;
+    float: left;
+    position: relative;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+* {
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+
+</style>
+
+<div class="rad">
+    <div class="kol red">
+        <div class="wide green">A</div>
+    </div>
+    <div class="kol blue">
+        <div class="wide yellow">B</div>
+    </div>
+</div>
+
+</body>
+</html>

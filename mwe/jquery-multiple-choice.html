@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+<body>
+
+	<script type="text/javascript" src="scripts/jquery-2.1.0.js"></script>
+	<script type="text/javascript" src="scripts/jquery-ui-1.10.4/jquery-ui.js"></script>
+
+	<link rel="stylesheet" href="scripts/jquery-ui-1.10.4/jquery-ui.css">
+
+	<style type="text/css">
+		.ui-selecting {
+			background: #00dd00;
+		}
+		.ui-selected {
+			color: #ffffff;
+			background: #00bb00;
+		}
+		.ui-selectee:hover {
+			background: #00dd00;	
+		}
+	</style>
+
+	<ol>
+		<li>Item 1</li>
+		<li>Item 2</li>
+		<li>Item 3</li>
+		<li>Item 4</li>
+		<li>Item 5</li>
+	</ol>
+	
+	<script type="text/javascript">
+		//$("ol").selectable();
+
+		$("ol").bind("mousedown", function(evt) {
+			//alert("click!");
+    		evt.metaKey = true;
+		}).selectable();
+
+	</script>
+
+</body>
+</html>
