@@ -1,0 +1,101 @@
+<!DOCTYPE HTML>
+<html>
+<body>
+
+	<script type="text/javascript" src="scripts/jquery-2.1.0.js"></script>
+	<script type="text/javascript" src="scripts/jquery.validate-1.11.1.js"></script>
+
+	<style>
+		.is-error input {
+			background-color: #ffdddd;
+		}
+		.is-error label {
+			color: #dd0000;
+		}
+		.inline-divs > div {
+			display: inline-block;
+			vertical-align: top;
+		}
+		.label {
+			width: 5em;
+		}
+	</style>
+
+	<form>
+		<div class="inline-divs">
+			<div class="label">
+				<label for="short">Short Text</label>
+			</div>
+			<div>
+				<div>
+					<input id="short" name="short" />
+				</div>
+			</div>
+		</div>
+		<div class="inline-divs">
+			<div class="label">
+				<label for="short">Long Text</label>
+			</div>
+			<div>
+				<div>
+					<input id="long" name="long" />
+				</div>
+			</div>
+		</div>
+		<div>
+			<button type="submit">Submit</button>
+		</div>
+	</form>
+
+	<script>
+
+		// Documentation
+		// http://jqueryvalidation.org/validate/
+
+		$("form").validate({
+			rules: {
+				debug: true,
+				short: {
+					required: true,
+					maxlength: 10
+				},
+				long: {
+					required: true,
+					minlength: 10
+				}
+			},
+			messages: {
+				short: {
+					required: "Field is required",
+					maxlength: "Field maxlength is 10"
+				},
+				long: {
+					required: "Field is required",
+					minlength: "Field minlength is 10"
+				}
+			},
+			submitHandler: function(form) {
+				console.log("Form is valid, submitting...");
+			},
+			invalidHandler: function(event, validator) {
+				console.log("Form is invalid");
+				console.log(event);
+				console.log(validator);
+			},
+			errorClass: "is-error",
+			validClass: "is-valid",
+			wrapper: "div",
+			highlight: function(element, errorClass, validClass) {
+				$(element).parent("div").parent("div").addClass(errorClass).removeClass(validClass);
+			},
+			unhighlight: function(element, errorClass, validClass) {
+			    $(element).parent("div").parent("div").addClass(validClass).removeClass(errorClass);
+			},
+			errorPlacement: function(error, element) {
+				error.appendTo(element.parent().parent());
+			}
+		});
+	</script>
+
+</body>
+</html>
