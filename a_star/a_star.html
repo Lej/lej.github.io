@@ -1,0 +1,327 @@
+<html>
+  <head>
+    <style type="text/css">
+      canvas {
+        background-color: #dddddd;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="500" height="500" />
+
+    <script type="text/javascript">
+
+      // r, g, b, [0, 255] a [0, 1]
+      var Color = function Color(r, g, b, a) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+      };
+
+      Color.prototype = function() {
+
+        var toCss = function() {
+          return "rgba" + "(r,g,b,a)"
+              .replace("r", Math.round(this.r))
+              .replace("g", Math.round(this.g))
+              .replace("b", Math.round(this.b))
+              .replace("a", Math.round(this.a));
+        };
+
+        return {
+          toCss: toCss,
+        };
+
+      } ();
+
+      var Colors = {
+        black: new Color(0, 0, 0, 1),
+        egyptianBlue: new Color(16, 52, 166, 1),
+        cornflowerBlue: new Color(100, 149, 237, 1),
+        lightBlue: new Color(173, 216, 230, 1)
+      };
+        
+      var Vector2 = function (x, y) {
+        this.x = x;
+        this.y = y;
+      };
+
+      Vector2.prototype = function() {
+
+        var equals = function(other) {
+          return JSON.stringify(this) == JSON.stringify(other);
+        };
+
+        var distance = function(other) {
+          var dx = Math.abs(this.x - other.x);
+          var dy = Math.abs(this.y - other.y);
+          var d = Math.sqrt(dx * dx + dy * dy);
+          return d;
+        };
+
+        return {
+          equals: equals,
+          distance: distance,
+        };
+
+      } ();
+
+      var Image = function(size) {
+
+        this.canvas  = document.getElementById("canvas");
+        this.context = canvas.getContext("2d");
+        this.size = size;
+        this.scale = {};
+        this.scale.x = canvas.width / size.x;
+        this.scale.y = canvas.height / size.y;
+
+      };
+
+      Image.prototype = function() {
+
+        var setPixelColor = function(position, color) {
+          this.context.fillStyle = color.toCss();
+          this.context.fillRect(
+            this.scale.x * position.x,
+            this.scale.y * position.y,
+            this.scale.x,
+            this.scale.y
+          );
+        };
+
+        return {
+          setPixelColor: setPixelColor,
+        };
+
+      } ();
+
+      var Dictionary = function() {
+        this.items = {};
+        this.count = 0;
+      }
+
+      Dictionary.prototype = function() {
+
+        var add = function(key, value) {
+          var index = JSON.stringify(key);
+          if (!contains.call(this, key)) {
+            this.count++;
+          }
+          this.items[index] = {
+            key: key,
+            value: value
+          };
+        }
+
+        var get = function(key) {
+          var index = JSON.stringify(key);
+          if (contains.call(this, key)) {
+            return this.items[index].value;
+          }
+        }
+
+        var remove = function(key) {
+          var index = JSON.stringify(key);
+          if (contains.call(this, key)) {
+            this.count--;
+          }
+          delete this.items[index];
+        }
+
+        var contains = function(key) {
+          var index = JSON.stringify(key);
+          return typeof this.items[index] !== "undefined";
+        }
+
+        // Slow, should use a min-heap
+        var min = function() {
+          var min;
+          for (var index in this.items) {
+            if (this.items.hasOwnProperty(index)) {
+              var item = this.items[index];
+              if (typeof min === "undefined" || item.value < min.value) {
+                min = item;
+              }
+            }
+          }
+          return min.key;
+        }
+
+        var forEach = function(callback) {
+          for (var index in this.items) {
+            if (this.items.hasOwnProperty(index)) {
+              var item = this.items[index];
+              callback(item.key, item.value);
+            }
+          }
+        }
+
+        return {
+          add: add,
+          get: get,
+          remove: remove,
+          contains: contains,
+          min: min,
+          forEach: forEach
+        };
+
+      } ();
+
+      var AStar = function(level) {
+        this.level = level
+        this.delay = 0;
+      };
+
+      AStar.prototype = function() {
+
+        var reconstructPath = function(parents, current) {
+
+            draw.call(this, current, Colors.egyptianBlue);
+
+            if (!parents.contains(current)) {
+              return [];
+            }
+
+            var parent = parents.get(current);
+            var path = reconstructPath.call(this, parents, parent);
+            path.push(parent);
+            return path;
+
+        }
+
+        var draw = function(position, color) {
+
+          this.delay += 10;
+          setTimeout(function() {
+            this.level.image.setPixelColor(position, color);
+          }, this.delay);
+
+        }
+
+        var path = function(start, goal) {
+
+          var distancesFromStart = new Dictionary();
+          distancesFromStart.add(start, 0);
+
+          var totalDistances = new Dictionary();
+          totalDistances.add(start, start.distance(goal));
+
+          var pointsToCheck = new Dictionary();
+          pointsToCheck.add(start, 0);
+
+          var checkedPoints = new Dictionary();
+
+          var parents = new Dictionary();
+
+          while (pointsToCheck.count > 0) {
+
+            var current = pointsToCheck.min();
+
+            if (current.equals(goal)) {
+              return reconstructPath.call(this, parents, goal);
+            }
+
+            pointsToCheck.remove(current);
+            checkedPoints.add(current);
+            draw.call(this, current, Colors.cornflowerBlue);
+
+            for (var dx = -1; dx <= 1; dx++) {
+              for (var dy = -1; dy <= 1; dy++) {
+
+                var neighbour = new Vector2(current.x + dx, current.y + dy);            
+
+                if (dx == 0 && dy == 0
+                    || neighbour.x < 0
+                    || neighbour.x > this.level.image.size.x - 1
+                    || neighbour.y < 0
+                    || neighbour.y > this.level.image.size.y - 1
+                    || this.level.obstacles.contains(neighbour)
+                    || checkedPoints.contains(neighbour)) {
+                  continue;
+                }
+
+                var distanceFromStart = distancesFromStart.get(current) + current.distance(neighbour);
+
+                if (!pointsToCheck.contains(neighbour)
+                    || distanceFromStart < distancesFromStart.get(neighbour)) {
+                  distancesFromStart.add(neighbour, distanceFromStart);
+                  parents.add(neighbour, current);
+                  totalDistances.add(neighbour, distanceFromStart + neighbour.distance(goal));
+                  if (!checkedPoints.contains(neighbour)) {
+                    pointsToCheck.add(neighbour, totalDistances.get(neighbour));
+                  }
+                  draw.call(this, neighbour, Colors.lightBlue);
+                }
+
+              }
+
+            }
+
+          }
+
+        };
+
+        return {
+          path: path
+        };
+
+      } ();
+
+      var Level = function(image, obstacles) {
+
+        this.image = image;
+        this.obstacles = obstacles;
+        this.aStar = new AStar(this);
+
+      }
+
+      Level.prototype = function() {
+
+        var render = function() {
+          obstacles.forEach(function(key, value) {
+            this.image.setPixelColor(key, Colors.black);
+          });
+        }
+
+        var path = function(start, goal) {
+          return this.aStar.path(start, goal);
+        };
+
+        return {
+          render: render,
+          path: path
+        };
+
+      } ();
+
+      // Settings and image
+      var width = 12;
+      var height = 12;
+      var size = new Vector2(width, height);
+      var image = new Image(size);
+      var start = new Vector2(0, 0);
+      var goal = new Vector2(width - 1, height - 1);
+
+      // Create some obstacles
+      var obstacles = new Dictionary();
+      for (var x = 0; x < width - 1; x++) {
+        var obstacle = new Vector2(x, 4);
+        obstacles.add(obstacle);
+      }
+      for (var x = 1; x < width; x++) {
+        var obstacle = new Vector2(x, 8);
+        obstacles.add(obstacle);
+      }
+
+      // Create and draw level
+      var level = new Level(image, obstacles);
+      level.render();
+
+      // Calculate and draw path
+      var path = level.path(start, goal);
+      
+    </script>
+
+  </body>
+</html>
