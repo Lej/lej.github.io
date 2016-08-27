@@ -1,3 +1,7 @@
 input {
     width: 900px;
 }
+
+.source {
+    opacity: 0.2;
+}
